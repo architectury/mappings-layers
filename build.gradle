@@ -1,0 +1,54 @@
+plugins {
+    id "org.cadixdev.licenser" version "0.5.0"
+}
+
+def runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "9999"
+
+allprojects {
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "org.cadixdev.licenser"
+
+    ext {
+        baseVersion = "1.0"
+    }
+
+    license {
+        header = rootProject.file("HEADER")
+
+        ext {
+            name = "architectury"
+            year = "2021"
+        }
+
+        include "**/*.java"
+
+        ignoreFailures = true
+    }
+
+    group "me.shedaniel"
+    version "$baseVersion.$runNumber"
+    archivesBaseName = "mappings-layers-" + project.name
+
+    repositories {
+        mavenCentral()
+        maven { url "https://maven.fabricmc.net/" }
+        maven { url "https://maven.shedaniel.me/" }
+    }
+
+    dependencies {
+        implementation "commons-io:commons-io:2.8.0"
+        implementation "org.zeroturnaround:zt-zip:1.14"
+        implementation "com.google.guava:guava:30.1-jre"
+        implementation "net.fabricmc:tiny-mappings-parser:0.3.0+build.17"
+        implementation("net.fabricmc:stitch:0.5.1+build.77") {
+            exclude module: "mercury"
+            exclude module: "enigma"
+        }
+        compileOnly "org.jetbrains:annotations:20.1.0"
+        compileOnly "me.shedaniel.architectury:refmap-remapper:1.0.4"
+    }
+}
+
+task licenseFormatAll
+subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }

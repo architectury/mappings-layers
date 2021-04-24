@@ -1,0 +1,7 @@
+configurations {
+    dev
+}
+
+artifacts {
+    dev jar
+}
