@@ -17,8 +17,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import me.shedaniel.mappingslayers.api.mutable.MutableTinyTree;
-import me.shedaniel.mappingslayers.api.utils.MappingsUtils;
+import dev.architectury.mappingslayers.api.mutable.MutableTinyTree;
+import dev.architectury.mappingslayers.api.utils.MappingsUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

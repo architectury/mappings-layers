@@ -7,7 +7,7 @@ ___
 
 ```groovy
 plugins {
-    id "me.shedaniel.mappings-layers-plugin" version "1.0-SNAPSHOT"
+    id "dev.architectury.mappings-layers-plugin" version "1.1-SNAPSHOT"
 }
 
 dependencies {

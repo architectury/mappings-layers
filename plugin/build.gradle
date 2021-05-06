@@ -1,37 +1,21 @@
 plugins {
     id "java-gradle-plugin"
-    id "com.github.johnrengelman.shadow" version "4.0.4"
-}
-
-configurations {
-    shadowGood
 }
 
 dependencies {
     implementation gradleApi()
-    compileOnly project(":core")
-    shadowGood project(path: ":core", configuration: "dev")
+    implementation project(":core")
 }
 
 gradlePlugin {
+    automatedPublishing = false
     plugins {
         fabricLoom {
-            id = "me.shedaniel.mappings-layers-plugin"
-            implementationClass = "me.shedaniel.mappingslayers.MappingsLayersPlugin"
+            id = "dev.architectury.mappings-layers-plugin"
+            implementationClass = "dev.architectury.mappingslayers.MappingsLayersPlugin"
         }
     }
 }
-
-jar {
-    classifier "bad"
-}
-
-shadowJar {
-    configurations = [project.configurations.shadowGood]
-    classifier null
-}
-
-build.dependsOn shadowJar
 
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -39,34 +23,31 @@ import org.w3c.dom.Node
 
 publishing {
     publications {
-        maven(MavenPublication) { publication ->
+        maven(MavenPublication) {
             groupId project.group
             artifactId project.archivesBaseName
 
             from components.java
-            artifact shadowJar
         }
 
         plugin(MavenPublication) {
-            groupId "me.shedaniel.mappings-layers-plugin"
-            artifactId "me.shedaniel.mappings-layers-plugin.gradle.plugin"
+            groupId "dev.architectury.mappings-layers-plugin"
+            artifactId "dev.architectury.mappings-layers-plugin.gradle.plugin"
 
             from components.java
-            artifact shadowJar
         }
 
-        mavenSnapshot(MavenPublication) { publication ->
+        mavenSnapshot(MavenPublication) {
             groupId project.group
             artifactId project.archivesBaseName
             version baseVersion + "-SNAPSHOT"
 
             from components.java
-            artifact shadowJar
         }
 
-        pluginSnapshot(MavenPublication) { publication ->
-            groupId "me.shedaniel.mappings-layers-plugin"
-            artifactId "me.shedaniel.mappings-layers-plugin.gradle.plugin"
+        pluginSnapshot(MavenPublication) {
+            groupId "dev.architectury.mappings-layers-plugin"
+            artifactId "dev.architectury.mappings-layers-plugin.gradle.plugin"
             version baseVersion + "-SNAPSHOT"
 
             pom.withXml {

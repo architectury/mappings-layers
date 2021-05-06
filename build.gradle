@@ -26,27 +26,22 @@ allprojects {
         ignoreFailures = true
     }
 
-    group "me.shedaniel"
+    group "dev.architectury"
     version "$baseVersion.$runNumber"
     archivesBaseName = "mappings-layers-" + project.name
 
     repositories {
         mavenCentral()
         maven { url "https://maven.fabricmc.net/" }
-        maven { url "https://maven.shedaniel.me/" }
+        maven { url "https://maven.architectury.dev/" }
     }
 
     dependencies {
         implementation "commons-io:commons-io:2.8.0"
-        implementation "org.zeroturnaround:zt-zip:1.14"
         implementation "com.google.guava:guava:30.1-jre"
         implementation "net.fabricmc:tiny-mappings-parser:0.3.0+build.17"
-        implementation("net.fabricmc:stitch:0.5.1+build.77") {
-            exclude module: "mercury"
-            exclude module: "enigma"
-        }
+        implementation "dev.architectury:refmap-remapper:1.0.5"
         compileOnly "org.jetbrains:annotations:20.1.0"
-        compileOnly "me.shedaniel.architectury:refmap-remapper:1.0.4"
     }
 }
 
