@@ -19,24 +19,26 @@
 
 package me.shedaniel.mappingslayers.impl.tiny;
 
+import me.shedaniel.mappingslayers.api.mutable.MutableTinyMetadata;
 import net.fabricmc.mapping.reader.v2.TinyMetadata;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class TinyMetadataImpl implements TinyMetadata {
-    private final int majorVersion;
-    private final int minorVersion;
+public class TinyMetadataImpl implements TinyMetadata, MutableTinyMetadata {
+    private int majorVersion;
+    private int minorVersion;
     private final List<String> namespaces;
     private final Map<String, String> properties;
     private final Map<String, Integer> index;
     
+    public TinyMetadataImpl(TinyMetadata metadata) {
+        this(metadata.getMajorVersion(), metadata.getMinorVersion(), metadata.getNamespaces(), metadata.getProperties());
+    }
+    
     public TinyMetadataImpl(int majorVersion, int minorVersion, List<String> namespaces, Map<String, String> properties) {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
-        this.namespaces = new ArrayList<>(namespaces);
+        this.namespaces = Collections.unmodifiableList(new ArrayList<>(namespaces));
         this.properties = new HashMap<>(properties);
         this.index = new HashMap<>();
         for (int i = 0; i < namespaces.size(); i++) {
@@ -67,5 +69,49 @@ public class TinyMetadataImpl implements TinyMetadata {
     @Override
     public Map<String, String> getProperties() {
         return properties;
+    }
+    
+    @Override
+    public void setMajorVersion(int majorVersion) {
+        this.majorVersion = majorVersion;
+    }
+    
+    @Override
+    public void setMinorVersion(int minorVersion) {
+        this.minorVersion = minorVersion;
+    }
+    
+    @Override
+    public MutableTinyMetadata withNewNamespaces(List<String> newNamespaces) {
+        return new TinyMetadataImpl(getMajorVersion(), getMinorVersion(), newNamespaces, getProperties());
+    }
+    
+    @Override
+    public MutableTinyMetadata copy() {
+        return withNewNamespaces(namespaces);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TinyMetadataImpl)) return false;
+        
+        TinyMetadataImpl that = (TinyMetadataImpl) o;
+        
+        if (majorVersion != that.majorVersion) return false;
+        if (minorVersion != that.minorVersion) return false;
+        if (!namespaces.equals(that.namespaces)) return false;
+        if (!properties.equals(that.properties)) return false;
+        return index.equals(that.index);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = majorVersion;
+        result = 31 * result + minorVersion;
+        result = 31 * result + namespaces.hashCode();
+        result = 31 * result + properties.hashCode();
+        result = 31 * result + index.hashCode();
+        return result;
     }
 }

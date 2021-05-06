@@ -23,17 +23,41 @@ import me.shedaniel.mappingslayers.api.mutable.MappingsEntry;
 import me.shedaniel.mappingslayers.api.transform.MappingsTransformation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface MappingsTransformationBuilder {
+    MappingsTransformationContext getContext();
+    
     void add(MappingsTransformation transformation);
     
+    /**
+     * Adds / replaces a mapping of a class.
+     *
+     * @param intermediary the intermediary name of the class, for example
+     *                     {@code net/minecraft/class_310}
+     * @param mapped       the mapped name of the class
+     */
     void mapClass(String intermediary, String mapped);
     
+    /**
+     * Adds / replaces a mapping of a method.
+     *
+     * @param intermediary the intermediary name of the method, for example
+     *                     {@code method_23182}
+     * @param mapped       the mapped name of the method
+     */
     void mapMethod(String intermediary, String mapped);
     
+    /**
+     * Adds / replaces a mapping of a field.
+     *
+     * @param intermediary the intermediary name of the field, for example
+     *                     {@code field_1700}
+     * @param mapped       the mapped name of the field
+     */
     void mapField(String intermediary, String mapped);
     
     default void unmapClass(String intermediary) {
@@ -50,7 +74,9 @@ public interface MappingsTransformationBuilder {
     
     void overrideOnly(Mappings mappings, MappingOverridePredicate predicate);
     
-    void overrideOnly(Object notation, MappingOverridePredicate predicate);
+    default void overrideOnly(Object notation, MappingOverridePredicate predicate) {
+        overrideOnly(getContext().resolveMappings(notation), predicate);
+    }
     
     default void overrideAll(Mappings mappings) {
         overrideOnly(mappings, (entry, replaced) -> true);
@@ -66,6 +92,23 @@ public interface MappingsTransformationBuilder {
     
     default void overrideMissing(Object notation) {
         overrideOnly(notation, (entry, replaced) -> entry == null);
+    }
+    
+    /**
+     * Replaces mapped mappings via regex.
+     *
+     * @param typePredicate the type predicate of the {@link MappingsEntry}
+     * @param regex         the regex to match for
+     * @param replacement   the replacement
+     */
+    void replace(Predicate<MappingsEntryType> typePredicate, String regex, String replacement);
+    
+    default void replace(MappingsEntryType t, String regex, String replacement) {
+        replace(type -> type == t, regex, replacement);
+    }
+    
+    default void replace(String regex, String replacement) {
+        replace(type -> true, regex, replacement);
     }
     
     void replace(Predicate<MappingsEntryType> typePredicate, Consumer<MappingsEntry> operator);
@@ -90,4 +133,6 @@ public interface MappingsTransformationBuilder {
     }
     
     String uuid();
+    
+    List<MappingsTransformation> getTransformations();
 }

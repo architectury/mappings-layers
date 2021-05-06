@@ -23,6 +23,8 @@ import net.fabricmc.mapping.tree.Mapped;
 import org.jetbrains.annotations.Nullable;
 
 public interface MutableMapped extends Mapped, MappingsEntry {
+    void setName(int namespace, String name);
+    
     void setName(String namespace, String name);
     
     void setComment(@Nullable String comment);

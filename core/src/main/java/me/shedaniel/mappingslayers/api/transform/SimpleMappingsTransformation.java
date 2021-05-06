@@ -20,16 +20,17 @@
 package me.shedaniel.mappingslayers.api.transform;
 
 import me.shedaniel.mappingslayers.api.MappingsEntryType;
-import me.shedaniel.mappingslayers.api.mutable.MappingsEntry;
+import me.shedaniel.mappingslayers.api.mutable.MutableMapped;
 import me.shedaniel.mappingslayers.api.mutable.MutableTinyTree;
+import me.shedaniel.mappingslayers.api.utils.MappingsUtils;
 
 public interface SimpleMappingsTransformation extends MappingsTransformation {
-    void handle(MappingsEntry entry);
+    void handle(MutableMapped entry);
     
     boolean handleType(MappingsEntryType type);
     
     @Override
     default void handle(MutableTinyTree tree) {
-        TinyTreeEntryIterator.iterate(tree, this::handleType, this::handle);
+        MappingsUtils.walk(tree, this::handleType, this::handle);
     }
 }

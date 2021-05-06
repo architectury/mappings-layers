@@ -20,10 +20,11 @@
 package me.shedaniel.mappingslayers.impl.mappings;
 
 import me.shedaniel.mappingslayers.api.Mappings;
+import me.shedaniel.mappingslayers.api.MappingsReaders;
 import me.shedaniel.mappingslayers.api.mutable.MutableTinyTree;
-import me.shedaniel.mappingslayers.api.serializer.TinyTreeSerializer;
+import me.shedaniel.mappingslayers.api.utils.MappingsUtils;
+import me.shedaniel.mappingslayers.impl.serializer.TinyTreeSerializer;
 import me.shedaniel.mappingslayers.api.transform.MappingsTransformation;
-import me.shedaniel.mappingslayers.impl.tiny.TinyTreeImpl;
 import net.fabricmc.mapping.tree.TinyTree;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class TinyTreeMappings implements Mappings {
     private String uuid;
     
     public TinyTreeMappings(TinyTree tree, String uuid) {
-        this.tree = new TinyTreeImpl(tree.getMetadata(), tree.getClasses());
+        this.tree = MappingsUtils.copyAsMutable(tree);
         this.uuid = uuid;
     }
     

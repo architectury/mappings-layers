@@ -19,6 +19,7 @@
 
 package me.shedaniel.mappingslayers.api.mutable;
 
+import me.shedaniel.mappingslayers.api.utils.MappingsUtils;
 import net.fabricmc.mapping.tree.ClassDef;
 import net.fabricmc.mapping.tree.TinyTree;
 
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface MutableTinyTree extends TinyTree {
+    MutableTinyMetadata getMetadata();
+    
     List<MutableClassDef> getClassesMutable();
     
     Map<String, MutableClassDef> getDefaultNamespaceClassMapMutable();
@@ -40,4 +43,10 @@ public interface MutableTinyTree extends TinyTree {
     default Map<String, ClassDef> getDefaultNamespaceClassMap() {
         return (Map<String, ClassDef>) (Map<String, ? extends ClassDef>) getDefaultNamespaceClassMapMutable();
     }
+    
+    default MutableTinyTree copy() {
+        return MappingsUtils.copyAsMutable(this);
+    }
+    
+    MutableClassDef getOrCreateClass(String primaryName);
 }

@@ -24,7 +24,10 @@ import me.shedaniel.mappingslayers.impl.mappings.TinyTreeMappings;
 import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -34,8 +37,8 @@ import java.nio.file.Path;
 public final class MappingsReaders {
     private MappingsReaders() {}
     
-    public static Mappings readDetection(File file) {
-        try (FileSystem fs = FileSystems.newFileSystem(file.toPath(), null)) {
+    public static Mappings readDetection(Path file) {
+        try (FileSystem fs = FileSystems.newFileSystem(file, null)) {
             Path tinyPath = fs.getPath("mappings/mappings.tiny");
             if (Files.exists(tinyPath)) {
                 byte[] bytes = Files.readAllBytes(tinyPath);
@@ -45,10 +48,10 @@ public final class MappingsReaders {
             if (Files.exists(fs.getPath("fields.csv")) && Files.exists(fs.getPath("methods.csv"))) {
                 return readMCP(fs);
             }
-            throw new IllegalArgumentException("Unknown mappings " + file.getAbsolutePath());
+            throw new IllegalArgumentException("Unknown mappings " + file);
         } catch (IOException e) {
             try {
-                byte[] bytes = Files.readAllBytes(file.toPath());
+                byte[] bytes = Files.readAllBytes(file);
                 String uuid = Hashing.sha512().hashBytes(bytes).toString();
                 return readTiny(new String(bytes, StandardCharsets.UTF_8), uuid);
             } catch (IOException ioException) {
@@ -60,7 +63,7 @@ public final class MappingsReaders {
     }
     
     public static Mappings readMCP(FileSystem fs) {
-        return null;
+        throw new UnsupportedOperationException("MCP is not supported yet!");
     }
     
     public static Mappings readTiny(String content, String uuid) {

@@ -28,6 +28,7 @@ import net.fabricmc.mapping.tree.ParameterDef;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,15 +43,15 @@ public class MethodDefImpl extends DescriptoredImpl implements MutableMethodDef 
         this.localVariables = localVariables;
     }
     
-    public MethodDefImpl(TinyTreeImpl parent, String[] names, @Nullable String comment, String descriptor,
+    public static MethodDefImpl of(TinyTreeImpl parent, String[] names, @Nullable String comment, String descriptor,
             Collection<ParameterDef> parameters, Collection<LocalVariableDef> localVariables) {
-        this(parent, names, comment, descriptor, (List<MutableParameterDef>) parameters.stream().<MutableParameterDef>map(def ->
+        return new MethodDefImpl(parent, names, comment, descriptor, parameters.stream().<MutableParameterDef>map(def ->
                 new ParameterDefImpl(parent, buildNames(parent.getMetadata(), def), def.getComment(), def.getLocalVariableIndex()))
                 .collect(Collectors.toList()), localVariables);
     }
     
-    public MethodDefImpl(TinyTreeImpl parent, MethodDef def) {
-        this(parent, buildNames(parent.getMetadata(), def), def.getComment(),
+    public static MethodDefImpl of(TinyTreeImpl parent, MethodDef def) {
+        return of(parent, buildNames(parent.getMetadata(), def), def.getComment(),
                 def.getDescriptor(parent.getMetadata().getNamespaces().get(0)),
                 def.getParameters(), def.getLocalVariables());
     }
@@ -68,5 +69,42 @@ public class MethodDefImpl extends DescriptoredImpl implements MutableMethodDef 
     @Override
     public MappingsEntryType getType() {
         return MappingsEntryType.METHOD;
+    }
+    
+    @Override
+    public MutableParameterDef getOrCreateParameter(int lvIndex, String primaryName) {
+        for (MutableParameterDef parameterDef : getParametersMutable()) {
+            if (parameterDef.getLocalVariableIndex() == lvIndex) {
+                parameterDef.setName(0, primaryName);
+                return parameterDef;
+            }
+        }
+        String[] names = new String[parent.getMetadata().getNamespaces().size()];
+        names[0] = primaryName;
+        for (int i = 1; i < names.length; i++) {
+            names[i] = "";
+        }
+        MutableParameterDef def = new ParameterDefImpl(parent, names, null, lvIndex);
+        parameters.add(def);
+        parameters.sort(Comparator.comparingInt(ParameterDef::getLocalVariableIndex));
+        return def;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MethodDefImpl)) return false;
+        if (!super.equals(o)) return false;
+        
+        MethodDefImpl methodDef = (MethodDefImpl) o;
+        
+        return parameters.equals(methodDef.parameters);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + parameters.hashCode();
+        return result;
     }
 }

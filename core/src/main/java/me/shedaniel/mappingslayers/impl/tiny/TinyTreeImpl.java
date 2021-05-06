@@ -20,37 +20,35 @@
 package me.shedaniel.mappingslayers.impl.tiny;
 
 import com.google.common.collect.ForwardingList;
-import me.shedaniel.architectury.refmapremapper.utils.DescriptorRemapper;
 import me.shedaniel.mappingslayers.api.mutable.MutableClassDef;
+import me.shedaniel.mappingslayers.api.mutable.MutableTinyMetadata;
 import me.shedaniel.mappingslayers.api.mutable.MutableTinyTree;
 import net.fabricmc.mapping.reader.v2.TinyMetadata;
 import net.fabricmc.mapping.tree.ClassDef;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TinyTreeImpl implements MutableTinyTree, ToIntFunction<String> {
-    private final TinyMetadata metadata;
+    private final MutableTinyMetadata metadata;
     private final Map<String, MutableClassDef> classMap = new HashMap<>();
     private final ClassList classes;
     private final String primaryNamespace;
     
-    public TinyTreeImpl(TinyMetadata metadata, Collection<ClassDef> classes) {
-        this.metadata = metadata;
-        this.classes = new ClassList(classes.stream().map(def -> new ClassDefImpl(this, def)).collect(Collectors.toList()));
-        this.primaryNamespace = metadata.getNamespaces().get(0);
+    public TinyTreeImpl(TinyMetadata metadata, Stream<ClassDef> classes) {
+        this.metadata = new TinyMetadataImpl(metadata);
+        this.classes = new ClassList(classes.map(def -> ClassDefImpl.of(this, def)).collect(Collectors.toList()));
+        this.primaryNamespace = this.metadata.getNamespaces().get(0);
         for (MutableClassDef classDef : this.classes) {
             this.classMap.put(classDef.getName(primaryNamespace), classDef);
         }
     }
     
     @Override
-    public TinyMetadata getMetadata() {
+    public MutableTinyMetadata getMetadata() {
         return metadata;
     }
     
@@ -69,23 +67,37 @@ public class TinyTreeImpl implements MutableTinyTree, ToIntFunction<String> {
         return metadata.index(value);
     }
     
-    public String remapDescriptorFromPrimary(String original, int target) {
-        return DescriptorRemapper.remapDescriptor(original, s -> {
-            MutableClassDef def = classMap.get(s);
-            if (def == null) return s;
-            return def.getName(target);
-        });
+    @Override
+    public MutableClassDef getOrCreateClass(String primaryName) {
+        MutableClassDef def = classMap.get(primaryName);
+        if (def != null)
+            return def;
+        String[] names = new String[getMetadata().getNamespaces().size()];
+        names[0] = primaryName;
+        for (int i = 1; i < names.length; i++) {
+            names[i] = "";
+        }
+        ClassDefImpl classDef = new ClassDefImpl(this, names, null, new ArrayList<>(), new ArrayList<>());
+        classes.add(classDef);
+        return classDef;
     }
     
-    public String remapDescriptorToPrimary(String original, int target) {
-        return DescriptorRemapper.remapDescriptor(original, s -> {
-            for (MutableClassDef def : classes) {
-                if (def.getRawName(target).equals(s)) {
-                    return def.getName(0);
-                }
-            }
-            return s;
-        });
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TinyTreeImpl)) return false;
+        
+        TinyTreeImpl tinyTree = (TinyTreeImpl) o;
+        
+        if (!metadata.equals(tinyTree.metadata)) return false;
+        return classes.equals(tinyTree.classes);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = metadata.hashCode();
+        result = 31 * result + classes.hashCode();
+        return result;
     }
     
     private class ClassList extends ForwardingList<MutableClassDef> {

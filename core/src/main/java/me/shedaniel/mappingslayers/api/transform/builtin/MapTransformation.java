@@ -20,9 +20,8 @@
 package me.shedaniel.mappingslayers.api.transform.builtin;
 
 import me.shedaniel.mappingslayers.api.MappingsEntryType;
-import me.shedaniel.mappingslayers.api.mutable.MappingsEntry;
+import me.shedaniel.mappingslayers.api.mutable.MutableMapped;
 import me.shedaniel.mappingslayers.api.transform.AbstractSimpleMappingsTransformation;
-import me.shedaniel.mappingslayers.api.transform.SimpleMappingsTransformation;
 
 public class MapTransformation extends AbstractSimpleMappingsTransformation {
     private final String intermediary;
@@ -40,7 +39,7 @@ public class MapTransformation extends AbstractSimpleMappingsTransformation {
     }
     
     @Override
-    public void handle(MappingsEntry entry) {
+    public void handle(MutableMapped entry) {
         if (entry.getIntermediary().equals(intermediary)) {
             entry.setMapped(mapped);
         }

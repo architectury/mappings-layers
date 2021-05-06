@@ -25,28 +25,28 @@ import net.fabricmc.mapping.tree.Mapped;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.function.ToIntFunction;
+import java.util.Objects;
 
 public abstract class MappedImpl implements MutableMapped {
-    protected final ToIntFunction<String> namespaceGetter;
+    protected final TinyTreeImpl parent;
     private final String[] names;
     @Nullable
     private String comment;
     
-    public MappedImpl(ToIntFunction<String> namespaceGetter, String[] names, @Nullable String comment) {
-        this.namespaceGetter = namespaceGetter;
+    public MappedImpl(TinyTreeImpl parent, String[] names, @Nullable String comment) {
+        this.parent = parent;
         this.names = names;
         this.comment = comment;
     }
     
     @Override
     public String getName(String namespace) {
-        return getName(namespaceGetter.applyAsInt(namespace));
+        return getName(parent.applyAsInt(namespace));
     }
     
     @Override
     public String getRawName(String namespace) {
-        return names[namespaceGetter.applyAsInt(namespace)];
+        return names[parent.applyAsInt(namespace)];
     }
     
     @Override
@@ -68,7 +68,12 @@ public abstract class MappedImpl implements MutableMapped {
     
     @Override
     public void setName(String namespace, String name) {
-        names[namespaceGetter.applyAsInt(namespace)] = name;
+        names[parent.applyAsInt(namespace)] = name;
+    }
+    
+    @Override
+    public void setName(int namespace, String name) {
+        names[namespace] = name;
     }
     
     @Nullable
@@ -89,5 +94,23 @@ public abstract class MappedImpl implements MutableMapped {
             names[i] = mapped.getRawName(metadata.getNamespaces().get(i));
         }
         return names;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MappedImpl)) return false;
+        
+        MappedImpl mapped = (MappedImpl) o;
+        
+        if (!Arrays.equals(names, mapped.names)) return false;
+        return Objects.equals(comment, mapped.comment);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(names);
+        result = 31 * result + (comment != null ? comment.hashCode() : 0);
+        return result;
     }
 }

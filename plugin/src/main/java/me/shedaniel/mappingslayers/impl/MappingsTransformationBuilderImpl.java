@@ -19,33 +19,34 @@
 
 package me.shedaniel.mappingslayers.impl;
 
-import me.shedaniel.mappingslayers.api.MappingOverridePredicate;
-import me.shedaniel.mappingslayers.api.Mappings;
-import me.shedaniel.mappingslayers.api.MappingsEntryType;
-import me.shedaniel.mappingslayers.api.MappingsTransformationBuilder;
+import me.shedaniel.mappingslayers.api.*;
 import me.shedaniel.mappingslayers.api.mutable.MappingsEntry;
+import me.shedaniel.mappingslayers.api.mutable.MutableMapped;
 import me.shedaniel.mappingslayers.api.transform.MappingsTransformation;
 import me.shedaniel.mappingslayers.api.transform.SimpleMappingsTransformation;
-import me.shedaniel.mappingslayers.api.transform.TinyTreeEntryIterator;
 import me.shedaniel.mappingslayers.api.transform.builtin.MapTransformation;
+import me.shedaniel.mappingslayers.api.utils.MappingsUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MappingsTransformationBuilderImpl implements MappingsTransformationBuilder {
     private final List<MappingsTransformation> transformations = new ArrayList<>();
-    private final Function<Object, Mappings> mappingsResolver;
+    private final MappingsTransformationContext context;
     private final long epic;
     
-    public MappingsTransformationBuilderImpl(Function<Object, Mappings> mappingsResolver) {
-        this.mappingsResolver = mappingsResolver;
+    public MappingsTransformationBuilderImpl(MappingsTransformationContext context) {
+        this.context = context;
         this.epic = new Random().nextLong();
+    }
+    
+    @Override
+    public MappingsTransformationContext getContext() {
+        return context;
     }
     
     @Override
@@ -77,18 +78,43 @@ public class MappingsTransformationBuilderImpl implements MappingsTransformation
     }
     
     @Override
-    public void overrideOnly(Object notation, MappingOverridePredicate predicate) {
-        overrideOnly(mappingsResolver.apply(notation), predicate);
+    public void replace(Predicate<MappingsEntryType> typePredicate, String regex, String replacement) {
+        Objects.requireNonNull(typePredicate, "typePredicate is null");
+        Objects.requireNonNull(regex, "regex is null");
+        Objects.requireNonNull(replacement, "replacement is null");
+        int id = MappingsUtils.getTypeId(typePredicate);
+        Pattern pattern = Pattern.compile(regex);
+        add(new SimpleMappingsTransformation() {
+            @Override
+            public void handle(MutableMapped entry) {
+                if (entry.isMapped()) {
+                    Matcher matcher = pattern.matcher(entry.getMapped());
+                    if (matcher.matches()) {
+                        entry.setMapped(matcher.replaceAll(replacement));
+                    }
+                }
+            }
+            
+            @Override
+            public boolean handleType(MappingsEntryType type) {
+                return typePredicate.test(type);
+            }
+            
+            @Override
+            public String uuid() {
+                return id + "\0" + regex + "\0" + replacement;
+            }
+        });
     }
     
     @Override
     public void replace(Predicate<MappingsEntryType> typePredicate, Consumer<MappingsEntry> operator) {
         Objects.requireNonNull(typePredicate, "typePredicate is null");
         Objects.requireNonNull(operator, "operator is null");
-        int id = TinyTreeEntryIterator.getTypeId(typePredicate);
+        int id = MappingsUtils.getTypeId(typePredicate);
         add(new SimpleMappingsTransformation() {
             @Override
-            public void handle(MappingsEntry entry) {
+            public void handle(MutableMapped entry) {
                 operator.accept(entry);
             }
             
@@ -110,7 +136,8 @@ public class MappingsTransformationBuilderImpl implements MappingsTransformation
                 .collect(Collectors.joining("||||"));
     }
     
+    @Override
     public List<MappingsTransformation> getTransformations() {
-        return transformations;
+        return Collections.unmodifiableList(transformations);
     }
 }

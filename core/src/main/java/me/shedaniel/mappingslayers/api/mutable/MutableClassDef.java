@@ -39,4 +39,8 @@ public interface MutableClassDef extends ClassDef, MutableMapped {
     default List<FieldDef> getFields() {
         return (List<FieldDef>) (List<? extends FieldDef>) getFieldsMutable();
     }
+    
+    MutableFieldDef getOrCreateField(String primaryName, String primaryDescriptor);
+    
+    MutableMethodDef getOrCreateMethod(String primaryName, String primaryDescriptor);
 }

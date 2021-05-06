@@ -25,4 +25,8 @@ public interface MutableDescriptored extends Descriptored, MutableMapped {
     void setPrimaryDescriptor(String descriptor);
     
     void setDescriptor(String namespace, String descriptor);
+    
+    void setDescriptor(int namespace, String descriptor);
+    
+    String getDescriptor(int namespace);
 }

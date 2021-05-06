@@ -20,15 +20,14 @@
 package me.shedaniel.mappingslayers.impl.tiny;
 
 import me.shedaniel.mappingslayers.api.mutable.MutableDescriptored;
+import me.shedaniel.mappingslayers.api.utils.MappingsUtils;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class DescriptoredImpl extends MappedImpl implements MutableDescriptored {
-    private final TinyTreeImpl parent;
     private String descriptor;
     
     public DescriptoredImpl(TinyTreeImpl parent, String[] names, @Nullable String comment, String descriptor) {
         super(parent, names, comment);
-        this.parent = parent;
         this.descriptor = descriptor;
     }
     
@@ -39,21 +38,47 @@ public abstract class DescriptoredImpl extends MappedImpl implements MutableDesc
     
     @Override
     public void setDescriptor(String namespace, String descriptor) {
-        int index = namespaceGetter.applyAsInt(namespace);
-        if (index == 0) {
+        setDescriptor(this.parent.applyAsInt(namespace), descriptor);
+    }
+    
+    @Override
+    public void setDescriptor(int namespace, String descriptor) {
+        if (namespace == 0) {
             setPrimaryDescriptor(descriptor);
         } else {
-            setPrimaryDescriptor(parent.remapDescriptorToPrimary(descriptor, index));
+            setPrimaryDescriptor(MappingsUtils.remapDescriptorToPrimary(parent, descriptor, namespace));
         }
     }
     
     @Override
     public String getDescriptor(String namespace) {
-        int index = namespaceGetter.applyAsInt(namespace);
-        if (index == 0) {
+        return getDescriptor(this.parent.applyAsInt(namespace));
+    }
+    
+    @Override
+    public String getDescriptor(int namespace) {
+        if (namespace == 0) {
             return descriptor;
         } else {
-            return parent.remapDescriptorFromPrimary(descriptor, index);
+            return MappingsUtils.remapDescriptorFromPrimary(parent, descriptor, namespace);
         }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DescriptoredImpl)) return false;
+        if (!super.equals(o)) return false;
+        
+        DescriptoredImpl that = (DescriptoredImpl) o;
+    
+        return descriptor.equals(that.descriptor);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + descriptor.hashCode();
+        return result;
     }
 }

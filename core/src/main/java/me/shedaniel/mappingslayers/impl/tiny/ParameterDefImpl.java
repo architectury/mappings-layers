@@ -23,12 +23,10 @@ import me.shedaniel.mappingslayers.api.MappingsEntryType;
 import me.shedaniel.mappingslayers.api.mutable.MutableParameterDef;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.ToIntFunction;
-
 public class ParameterDefImpl extends MappedImpl implements MutableParameterDef {
     private int lvIndex;
     
-    public ParameterDefImpl(ToIntFunction<String> namespaceGetter, String[] names, @Nullable String comment, int lvIndex) {
+    public ParameterDefImpl(TinyTreeImpl namespaceGetter, String[] names, @Nullable String comment, int lvIndex) {
         super(namespaceGetter, names, comment);
         this.lvIndex = lvIndex;
     }
@@ -46,5 +44,23 @@ public class ParameterDefImpl extends MappedImpl implements MutableParameterDef 
     @Override
     public MappingsEntryType getType() {
         return MappingsEntryType.PARAMETER;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ParameterDefImpl)) return false;
+        if (!super.equals(o)) return false;
+        
+        ParameterDefImpl that = (ParameterDefImpl) o;
+    
+        return lvIndex == that.lvIndex;
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + lvIndex;
+        return result;
     }
 }

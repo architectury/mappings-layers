@@ -29,8 +29,8 @@ public class FieldDefImpl extends DescriptoredImpl implements MutableFieldDef {
         super(parent, names, comment, descriptor);
     }
     
-    public FieldDefImpl(TinyTreeImpl parent, FieldDef def) {
-        this(parent, buildNames(parent.getMetadata(), def), def.getComment(), 
+    public static FieldDefImpl of(TinyTreeImpl parent, FieldDef def) {
+        return new FieldDefImpl(parent, buildNames(parent.getMetadata(), def), def.getComment(),
                 def.getDescriptor(parent.getMetadata().getNamespaces().get(0)));
     }
     

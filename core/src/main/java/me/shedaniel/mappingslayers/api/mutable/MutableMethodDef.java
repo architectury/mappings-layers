@@ -32,4 +32,6 @@ public interface MutableMethodDef extends MethodDef, MutableDescriptored {
     default Collection<ParameterDef> getParameters() {
         return (Collection<ParameterDef>) (Collection<? extends ParameterDef>) getParametersMutable();
     }
+    
+    MutableParameterDef getOrCreateParameter(int lvIndex, String primaryName);
 }
