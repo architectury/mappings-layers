@@ -24,5 +24,10 @@ import dev.architectury.mappingslayers.api.mutable.MutableTinyTree;
 public interface MappingsTransformation {
     String uuid();
     
-    void handle(MutableTinyTree tree);
+    default void handle(MutableTinyTree tree) {}
+    
+    default MutableTinyTree modify(MutableTinyTree tree) {
+        handle(tree);
+        return tree;
+    }
 }

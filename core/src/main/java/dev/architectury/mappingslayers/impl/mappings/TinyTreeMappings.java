@@ -50,7 +50,7 @@ public class TinyTreeMappings implements Mappings {
     @Override
     public Mappings withTransformations(List<MappingsTransformation> transformations) {
         for (MappingsTransformation transformation : transformations) {
-            transformation.handle(tree);
+            tree = transformation.modify(tree);
         }
         return this;
     }

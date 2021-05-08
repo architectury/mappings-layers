@@ -131,6 +131,7 @@ public final class MappingsUtils {
     }
     
     public static MutableTinyTree reorderNamespaces(MutableTinyTree tree, List<String> newNamespaces) {
+        if (newNamespaces.equals(tree.getMetadata().getNamespaces())) return tree.copy();
         checkCouldReorder(tree, newNamespaces);
         int[] reverseNamespacesMap = new int[newNamespaces.size()];
         for (int i = 0; i < reverseNamespacesMap.length; i++) {
