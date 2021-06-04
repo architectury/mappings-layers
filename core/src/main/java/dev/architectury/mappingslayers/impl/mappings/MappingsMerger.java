@@ -17,24 +17,21 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package dev.architectury.mappingslayers.api.mutable;
+package dev.architectury.mappingslayers.impl.mappings;
 
-import dev.architectury.mappingslayers.impl.tiny.TinyMetadataImpl;
-import net.fabricmc.mapping.reader.v2.TinyMetadata;
+import dev.architectury.mappingslayers.api.mutable.MutableDescriptored;
+import dev.architectury.mappingslayers.api.mutable.MutableMapped;
 
-import java.util.List;
-import java.util.Map;
-
-public interface MutableTinyMetadata extends TinyMetadata {
-    static MutableTinyMetadata create(int majorVersion, int minorVersion, List<String> namespaces, Map<String, String> properties) {
-        return new TinyMetadataImpl(majorVersion, minorVersion, namespaces, properties);
+public class MappingsMerger {
+    public static void copyOverNamesDescriptored(MutableDescriptored def, MutableDescriptored newDef, int[] mapper) {
+        copyOverNames(def, newDef, mapper);
+        newDef.setPrimaryDescriptor(def.getDescriptor(mapper[0]));
     }
     
-    void setMajorVersion(int majorVersion);
-    
-    void setMinorVersion(int minorVersion);
-    
-    MutableTinyMetadata withNewNamespaces(List<String> newNamespaces);
-    
-    MutableTinyMetadata copy();
+    public static void copyOverNames(MutableMapped def, MutableMapped newDef, int[] mapper) {
+        for (int i = 1; i < mapper.length; i++) {
+            newDef.setName(i, def.getName(mapper[i]));
+        }
+        newDef.setComment(def.getComment());
+    }
 }

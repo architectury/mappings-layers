@@ -34,4 +34,6 @@ public interface MutableMethodDef extends MethodDef, MutableDescriptored {
     }
     
     MutableParameterDef getOrCreateParameter(int lvIndex, String primaryName);
+    
+    MutableParameterDef constructParameter(int lvIndex, String primaryName);
 }

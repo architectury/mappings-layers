@@ -79,15 +79,20 @@ public class MethodDefImpl extends DescriptoredImpl implements MutableMethodDef 
                 return parameterDef;
             }
         }
+        MutableParameterDef def = constructParameter(lvIndex, primaryName);
+        parameters.add(def);
+        parameters.sort(Comparator.comparingInt(ParameterDef::getLocalVariableIndex));
+        return def;
+    }
+    
+    @Override
+    public MutableParameterDef constructParameter(int lvIndex, String primaryName) {
         String[] names = new String[parent.getMetadata().getNamespaces().size()];
         names[0] = primaryName;
         for (int i = 1; i < names.length; i++) {
             names[i] = "";
         }
-        MutableParameterDef def = new ParameterDefImpl(parent, names, null, lvIndex);
-        parameters.add(def);
-        parameters.sort(Comparator.comparingInt(ParameterDef::getLocalVariableIndex));
-        return def;
+        return new ParameterDefImpl(parent, names, null, lvIndex);
     }
     
     @Override

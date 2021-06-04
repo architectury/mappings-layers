@@ -43,4 +43,8 @@ public interface MutableClassDef extends ClassDef, MutableMapped {
     MutableFieldDef getOrCreateField(String primaryName, String primaryDescriptor);
     
     MutableMethodDef getOrCreateMethod(String primaryName, String primaryDescriptor);
+    
+    MutableFieldDef constructField(String primaryName, String primaryDescriptor);
+    
+    MutableMethodDef constructMethod(String primaryName, String primaryDescriptor);
 }

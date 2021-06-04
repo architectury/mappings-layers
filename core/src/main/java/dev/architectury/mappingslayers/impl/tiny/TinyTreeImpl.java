@@ -72,14 +72,19 @@ public class TinyTreeImpl implements MutableTinyTree, ToIntFunction<String> {
         MutableClassDef def = classMap.get(primaryName);
         if (def != null)
             return def;
+        MutableClassDef classDef = constructClass(primaryName);
+        classes.add(classDef);
+        return classDef;
+    }
+    
+    @Override
+    public MutableClassDef constructClass(String primaryName) {
         String[] names = new String[getMetadata().getNamespaces().size()];
         names[0] = primaryName;
         for (int i = 1; i < names.length; i++) {
             names[i] = "";
         }
-        ClassDefImpl classDef = new ClassDefImpl(this, names, null, new ArrayList<>(), new ArrayList<>());
-        classes.add(classDef);
-        return classDef;
+        return new ClassDefImpl(this, names, null, new ArrayList<>(), new ArrayList<>());
     }
     
     @Override

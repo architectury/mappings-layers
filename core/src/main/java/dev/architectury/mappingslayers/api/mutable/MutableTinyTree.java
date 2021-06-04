@@ -49,4 +49,6 @@ public interface MutableTinyTree extends TinyTree {
     }
     
     MutableClassDef getOrCreateClass(String primaryName);
+    
+    MutableClassDef constructClass(String primaryName);
 }

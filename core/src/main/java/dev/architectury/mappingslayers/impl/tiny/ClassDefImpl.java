@@ -77,12 +77,7 @@ public class ClassDefImpl extends MappedImpl implements MutableClassDef {
                 return fieldDef;
             }
         }
-        String[] names = new String[parent.getMetadata().getNamespaces().size()];
-        names[0] = primaryName;
-        for (int i = 1; i < names.length; i++) {
-            names[i] = "";
-        }
-        MutableFieldDef def = new FieldDefImpl(parent, names, null, primaryDescriptor);
+        MutableFieldDef def = constructField(primaryName, primaryDescriptor);
         fields.add(def);
         return def;
     }
@@ -94,14 +89,29 @@ public class ClassDefImpl extends MappedImpl implements MutableClassDef {
                 return methodDef;
             }
         }
+        MutableMethodDef def = constructMethod(primaryName, primaryDescriptor);
+        methods.add(def);
+        return def;
+    }
+    
+    @Override
+    public MutableFieldDef constructField(String primaryName, String primaryDescriptor) {
         String[] names = new String[parent.getMetadata().getNamespaces().size()];
         names[0] = primaryName;
         for (int i = 1; i < names.length; i++) {
             names[i] = "";
         }
-        MutableMethodDef def = new MethodDefImpl(parent, names, null, primaryDescriptor, new ArrayList<>(), new ArrayList<>());
-        methods.add(def);
-        return def;
+        return new FieldDefImpl(parent, names, null, primaryDescriptor);
+    }
+    
+    @Override
+    public MutableMethodDef constructMethod(String primaryName, String primaryDescriptor) {
+        String[] names = new String[parent.getMetadata().getNamespaces().size()];
+        names[0] = primaryName;
+        for (int i = 1; i < names.length; i++) {
+            names[i] = "";
+        }
+        return new MethodDefImpl(parent, names, null, primaryDescriptor, new ArrayList<>(), new ArrayList<>());
     }
     
     @Override
