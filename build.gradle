@@ -10,7 +10,7 @@ allprojects {
     apply plugin: "org.cadixdev.licenser"
 
     ext {
-        baseVersion = "1.1"
+        baseVersion = "1.2"
     }
 
     license {
