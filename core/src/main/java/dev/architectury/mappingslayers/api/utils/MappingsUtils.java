@@ -21,6 +21,7 @@ package dev.architectury.mappingslayers.api.utils;
 
 import dev.architectury.mappingslayers.api.MappingsEntryType;
 import dev.architectury.mappingslayers.api.mutable.*;
+import dev.architectury.mappingslayers.impl.mappings.Tsrg2Reader;
 import dev.architectury.mappingslayers.impl.serializer.TinyTreeSerializer;
 import dev.architectury.mappingslayers.impl.tiny.TinyTreeImpl;
 import dev.architectury.mappingslayers.impl.tiny.utils.TinyTreeEntryIterator;
@@ -29,6 +30,7 @@ import net.fabricmc.mapping.reader.v2.TinyMetadata;
 import net.fabricmc.mapping.tree.ClassDef;
 import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
+import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -201,6 +203,16 @@ public final class MappingsUtils {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+    
+    /**
+     * Deserializes a {@link MutableTinyTree} from the tsrg2 format.
+     *
+     * @param content the content of the mappings in tsrg2 format
+     * @return the mappings tree
+     */
+    public static MutableTinyTree deserializeFromTsrg2(String content) {
+        return Tsrg2Reader.read(IOUtils.lineIterator(new StringReader(content)));
     }
     
     /**
