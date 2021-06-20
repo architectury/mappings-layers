@@ -20,8 +20,8 @@
 package dev.architectury.mappingslayers.api;
 
 import com.google.common.hash.Hashing;
+import dev.architectury.mappingslayers.impl.mappings.TinyReader;
 import dev.architectury.mappingslayers.impl.mappings.TinyTreeMappings;
-import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
 
 import java.io.BufferedReader;
@@ -72,7 +72,7 @@ public final class MappingsReaders {
             System.out.println("Please use a v2 tiny-based mappings file! Field names will not be proposed!");
         }
         try {
-            return fromTinyTree(TinyMappingFactory.loadWithDetection(new BufferedReader(new StringReader(content))), uuid);
+            return fromTinyTree(TinyReader.loadWithDetection(new BufferedReader(new StringReader(content))), uuid);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

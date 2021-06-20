@@ -21,6 +21,7 @@ package dev.architectury.mappingslayers.api.utils;
 
 import dev.architectury.mappingslayers.api.MappingsEntryType;
 import dev.architectury.mappingslayers.api.mutable.*;
+import dev.architectury.mappingslayers.impl.mappings.TinyReader;
 import dev.architectury.mappingslayers.impl.mappings.Tsrg2Reader;
 import dev.architectury.mappingslayers.impl.serializer.TinyTreeSerializer;
 import dev.architectury.mappingslayers.impl.tiny.TinyTreeImpl;
@@ -28,7 +29,6 @@ import dev.architectury.mappingslayers.impl.tiny.utils.TinyTreeEntryIterator;
 import dev.architectury.refmapremapper.utils.DescriptorRemapper;
 import net.fabricmc.mapping.reader.v2.TinyMetadata;
 import net.fabricmc.mapping.tree.ClassDef;
-import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
 import org.apache.commons.io.IOUtils;
 
@@ -199,7 +199,7 @@ public final class MappingsUtils {
      */
     public static MutableTinyTree deserializeFromString(String content) {
         try {
-            return copyAsMutable(TinyMappingFactory.loadWithDetection(new BufferedReader(new StringReader(content))));
+            return copyAsMutable(TinyReader.loadWithDetection(new BufferedReader(new StringReader(content))));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
