@@ -23,6 +23,7 @@ import dev.architectury.mappingslayers.api.MappingsEntryType;
 import dev.architectury.mappingslayers.api.mutable.*;
 import dev.architectury.mappingslayers.impl.mappings.TinyReader;
 import dev.architectury.mappingslayers.impl.mappings.Tsrg2Reader;
+import dev.architectury.mappingslayers.impl.mappings.Tsrg2Writer;
 import dev.architectury.mappingslayers.impl.serializer.TinyTreeSerializer;
 import dev.architectury.mappingslayers.impl.tiny.TinyTreeImpl;
 import dev.architectury.mappingslayers.impl.tiny.utils.TinyTreeEntryIterator;
@@ -223,6 +224,16 @@ public final class MappingsUtils {
      */
     public static String serializeToString(TinyTree tree) {
         return TinyTreeSerializer.serialize(tree);
+    }
+    
+    /**
+     * Serializes a {@link MutableTinyTree} to the tsrg2 format.
+     *
+     * @param tree the mappings tree
+     * @return the content of the mappings in tiny format
+     */
+    public static String serializeToTsrg2(TinyTree tree) {
+        return Tsrg2Writer.serialize(tree);
     }
     
     /**

@@ -54,9 +54,17 @@ public class Tsrg2Reader {
                     break;
                 case 1:
                     if (group.length == namespaces.size() + 1) {
-                        methodDef = classDef.getOrCreateMethod(group[0], group[1]);
-                        for (int i = 2; i < group.length; i++) {
-                            methodDef.setName(i - 1, group[i]);
+                        String descriptor = group[1];
+                        if (descriptor.startsWith("(")) {
+                            methodDef = classDef.getOrCreateMethod(group[0], descriptor);
+                            for (int i = 2; i < group.length; i++) {
+                                methodDef.setName(i - 1, group[i]);
+                            }
+                        } else {
+                            MutableFieldDef fieldDef = classDef.getOrCreateField(group[0], descriptor);
+                            for (int i = 2; i < group.length; i++) {
+                                fieldDef.setName(i - 1, group[i]);
+                            }
                         }
                     } else {
                         MutableFieldDef fieldDef = classDef.getOrCreateField(group[0], "");
